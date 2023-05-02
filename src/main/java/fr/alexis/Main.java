@@ -1,74 +1,64 @@
 package fr.alexis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main {
+
+    static Integer[][] map = new Integer[20][20];
+    static Integer[][] strategiques = new Integer[10][10];
+    static Integer[][] interets = new Integer[10][10];
+
+
     public static void main(String[] args) {
-        printExcel();
-        //System.out.println(Arrays.deepToString(readExcel()));
+        getMap();
+//        displayMap();
     }
 
-    private static String[][] readExcel() {
-        String[][] values = new String[20][21]; // Tableau pour stocker les valeurs des cellules
+    public static void displayMap() {
+        Arrays.stream(map).map(Arrays::toString).forEach(System.out::println);
+    }
+
+    public static void getMap() {
+        File csvFile = new File("src/map/Map.csv");
+        List<String[]> dataList = null;
         try {
-            File file = new File("src/map/Map.xlsx");
-            Scanner scanner = new Scanner(file);
-            int rowIndex = 0;
-            System.out.println(scanner.hasNextLine());
-            while (scanner.hasNextLine()) {
-                System.out.println(rowIndex);
-                String line = scanner.nextLine();
-                if (line.isEmpty()) {
-                    continue; // Ignorer les lignes vides
-                }
-                String[] cells = line.split("\t");
-                if (cells.length != 21) {
-                    continue; // Ignorer les lignes qui ne contiennent pas 21 cellules
-                }
-                System.arraycopy(cells, 0, values[rowIndex], 0, cells.length);
-                rowIndex++;
-            }
-            scanner.close();
+            dataList = readCsv(csvFile);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return values;
+
+        // parcourir les données
+        int i = 0;
+        for (String[] data : dataList) {
+            for (int j = 0; j < data.length; j++) {
+                // On récupère les points
+//                if (i >= 3 && j >= 22 && data[j] != null && !data[j].isEmpty()) {
+//                    strategiques[i-3] = new Integer[] {Integer.valueOf(data[22]), Integer.valueOf(data[23])};
+//                    interets[Integer.parseInt(data[25])][Integer.parseInt(data[26])] = Integer.valueOf(data[27]);
+//                    System.out.println("Stratégique : " + Arrays.toString(strategiques[i-3]));
+//                    System.out.println("Intérêt : " + Arrays.deepToString(interets));
+//                }
+                // On ne prend pas en compte la première ligne et la première colonne
+                // On ne prend que les bonnes valeurs
+                if (i == 0 || i > 21 || j == 0 || j >= 21) continue;
+                map[i-1][j-1] = Integer.valueOf(data[j]);
+            }
+            i++;
+        }
     }
 
-    public static void printExcel() {
-        File file = new File("src/map/Map.xlsx");
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            XSSFWorkbook workbook = new XSSFWorkbook(fis);
-            Sheet sheet = workbook.getSheetAt(0);
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    switch (cell.getCellType()) {
-                        case STRING:
-                            System.out.print(cell.getStringCellValue() + "\t");
-                            break;
-                        case NUMERIC:
-                            System.out.print(cell.getNumericCellValue() + "\t");
-                            break;
-                        case BOOLEAN:
-                            System.out.print(cell.getBooleanCellValue() + "\t");
-                            break;
-                        default:
-                            System.out.print("\t");
-                            break;
-                    }
-                }
-                System.out.println();
+    public static List<String[]> readCsv(File csvFile) throws FileNotFoundException {
+        List<String[]> dataList = new ArrayList<>();
+
+        try (Scanner scanner = new Scanner(csvFile)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] data = line.split(",");
+                dataList.add(data);
             }
-            workbook.close();
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        return dataList;
     }
 }
