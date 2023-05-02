@@ -6,8 +6,8 @@ import java.util.*;
 public class Main {
 
     static Integer[][] map = new Integer[20][20];
-    static Integer[][] strategiques = new Integer[10][10];
-    static Integer[][] interets = new Integer[10][10];
+    static ArrayList<int[][]> strategiques = new ArrayList<>();
+    static ArrayList<int[]> interets = new ArrayList<>();
 
 
     public static void main(String[] args) {
@@ -33,12 +33,22 @@ public class Main {
         for (String[] data : dataList) {
             for (int j = 0; j < data.length; j++) {
                 // On récupère les points
-//                if (i >= 3 && j >= 22 && data[j] != null && !data[j].isEmpty()) {
-//                    strategiques[i-3] = new Integer[] {Integer.valueOf(data[22]), Integer.valueOf(data[23])};
+                if (i >= 3 && j >= 22 && data[j] != null && !data[j].isEmpty()) {
+                    int[][] tableauEntiers = new int[Integer.parseInt(data[22])][Integer.parseInt(data[23])];
+                    System.out.println(data[22] + " " +tableauEntiers);
+                    strategiques.add(tableauEntiers);
+
+                    // Affichage du contenu du tableau
+                    for (int z = 0; z < tableauEntiers.length; z++) {
+                        for (int v = 0; v < tableauEntiers[v].length; j++) {
+                            System.out.print(tableauEntiers[v][j] + " ");
+                        }
+                        System.out.println();
+                    }
 //                    interets[Integer.parseInt(data[25])][Integer.parseInt(data[26])] = Integer.valueOf(data[27]);
-//                    System.out.println("Stratégique : " + Arrays.toString(strategiques[i-3]));
+//                    System.out.println("Stratégique : " + Arrays.toString(strategiques.get(i - 3)));
 //                    System.out.println("Intérêt : " + Arrays.deepToString(interets));
-//                }
+                }
                 // On ne prend pas en compte la première ligne et la première colonne
                 // On ne prend que les bonnes valeurs
                 if (i == 0 || i > 21 || j == 0 || j >= 21) continue;
