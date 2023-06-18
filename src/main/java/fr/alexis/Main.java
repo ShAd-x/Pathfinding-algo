@@ -12,13 +12,19 @@ public class Main {
 
     public static void main(String[] args) {
         getMap();
-//        displayMap();
+        displayMap();
     }
 
+    /**
+     * Affiche la map
+     */
     public static void displayMap() {
         Arrays.stream(map).map(Arrays::toString).forEach(System.out::println);
     }
 
+    /**
+     * Récupère la map depuis le fichier CSV
+     */
     public static void getMap() {
         File csvFile = new File("src/map/Map.csv");
         List<String[]> dataList = null;
@@ -28,36 +34,55 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        // parcourir les données
+        // Parcourir les données
         int i = 0;
         for (String[] data : dataList) {
-            for (int j = 0; j < data.length; j++) {
-                // On récupère les points
-                if (i >= 3 && j >= 22 && data[j] != null && !data[j].isEmpty()) {
-                    int[][] tableauEntiers = new int[Integer.parseInt(data[22])][Integer.parseInt(data[23])];
-                    System.out.println(data[22] + " " +tableauEntiers);
-                    strategiques.add(tableauEntiers);
-
-                    // Affichage du contenu du tableau
-                    for (int z = 0; z < tableauEntiers.length; z++) {
-                        for (int v = 0; v < tableauEntiers[v].length; j++) {
-                            System.out.print(tableauEntiers[v][j] + " ");
-                        }
-                        System.out.println();
-                    }
-//                    interets[Integer.parseInt(data[25])][Integer.parseInt(data[26])] = Integer.valueOf(data[27]);
-//                    System.out.println("Stratégique : " + Arrays.toString(strategiques.get(i - 3)));
-//                    System.out.println("Intérêt : " + Arrays.deepToString(interets));
-                }
-                // On ne prend pas en compte la première ligne et la première colonne
-                // On ne prend que les bonnes valeurs
-                if (i == 0 || i > 21 || j == 0 || j >= 21) continue;
-                map[i-1][j-1] = Integer.valueOf(data[j]);
+            // Si c'est la première ligne, on passe
+            if (i == 0) {
+                i++;
+                continue;
+            }
+            for (int j = 1; j < 21; j++) {
+                map[i - 1][j - 1] = Integer.valueOf(dataList.get(i)[j]);
             }
             i++;
         }
     }
 
+    /**
+     * Récupère les points spéciaux
+     */
+    public static void getSpeciaux() {
+        File csvFile = new File("src/map/Map.csv");
+        List<String[]> dataList = null;
+        try {
+            dataList = readCsv(csvFile);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Parcourir les données
+        int i = 0;
+        for (String[] data : dataList) {
+            // Si c'est la première ligne, on passe
+            if (i <= 0) {
+                i++;
+                continue;
+            }
+            for (int j = 1; j < 21; j++) {
+                map[i - 1][j - 1] = Integer.valueOf(dataList.get(i)[j]);
+            }
+            i++;
+        }
+    }
+
+
+    /**
+     * Récupère les lignes depuis le fichier CSV
+     *
+     * @param csvFile
+     * @return List<String[]>
+     */
     public static List<String[]> readCsv(File csvFile) throws FileNotFoundException {
         List<String[]> dataList = new ArrayList<>();
 
