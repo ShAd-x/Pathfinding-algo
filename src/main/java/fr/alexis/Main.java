@@ -6,12 +6,15 @@ import java.util.*;
 public class Main {
 
     static Integer[][] map = new Integer[20][20];
-    static ArrayList<int[][]> strategiques = new ArrayList<>();
-    static ArrayList<int[]> interets = new ArrayList<>();
+    static ArrayList<int[]> strategiques = new ArrayList<>();
+    static HashMap<int[], Integer> interets = new HashMap<>();
 
 
     public static void main(String[] args) {
         getMap();
+        getSpeciaux();
+        //displayStrategiques();
+        //displayInterets();
         displayMap();
     }
 
@@ -64,18 +67,42 @@ public class Main {
         // Parcourir les données
         int i = 0;
         for (String[] data : dataList) {
-            // Si c'est la première ligne, on passe
-            if (i <= 0) {
+            // Deux premières lignes, on passe
+            if (i <= 2 || i >= 10) {
                 i++;
                 continue;
             }
-            for (int j = 1; j < 21; j++) {
-                map[i - 1][j - 1] = Integer.valueOf(dataList.get(i)[j]);
-            }
+            strategiques.add(new int[]{Integer.parseInt(dataList.get(i)[22]), Integer.parseInt(dataList.get(i)[23])});
+            interets.put(new int[]{Integer.parseInt(dataList.get(i)[25]), Integer.parseInt(dataList.get(i)[26])}, Integer.parseInt(dataList.get(i)[27]));
             i++;
         }
     }
 
+
+    /**
+     * Affiche les points stratégiques
+     */
+    public static void displayStrategiques() {
+        strategiques.stream()
+                .forEach(tableau -> {
+                    for (int valeur : tableau) {
+                        System.out.print(valeur + " ");
+                    }
+                    System.out.println();
+                });
+    }
+
+    /**
+     * Affiche les points d'intérêts
+     */
+    public static void displayInterets() {
+        for (Map.Entry<int[], Integer> entry : interets.entrySet()) {
+            int[] key = entry.getKey();
+            Integer valeur = entry.getValue();
+
+            System.out.print(Arrays.toString(key) + "=" + valeur + ", ");
+        }
+    }
 
     /**
      * Récupère les lignes depuis le fichier CSV
