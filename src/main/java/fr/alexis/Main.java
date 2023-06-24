@@ -43,7 +43,13 @@ public class Main {
         System.out.println("Score : " + calculateScore(highestScoringPath));
     }
 
-    // Recherche du chemin le plus court entre deux points sur la carte
+    /**
+     * Recherche du chemin le plus court entre deux points sur la carte
+     *
+     * @param start
+     * @param end
+     * @return Liste des points du chemin le plus court
+     */
     public static List<int[]> findShortestPath(int[] start, int[] end) {
         int[][] distances = new int[map.length][map[0].length];
         boolean[][] visited = new boolean[map.length][map[0].length];
@@ -98,27 +104,46 @@ public class Main {
         return new ArrayList<>();
     }
 
-    // Méthode auxiliaire pour obtenir les voisins valides d'une case
+    /**
+     * Obtient les voisins valides d'un point donné.
+     *
+     * @param point Le point dont on souhaite obtenir les voisins.
+     * @return Une liste des voisins valides du point.
+     */
     public static List<int[]> getNeighbors(int[] point) {
         int row = point[0];
         int col = point[1];
         List<int[]> neighbors = new ArrayList<>();
+
+        // Vérifie si le voisin du haut est valide
         if (row - 1 >= 0 && map[row - 1][col] != -1) {
             neighbors.add(new int[]{row - 1, col});
         }
+
+        // Vérifie si le voisin du bas est valide
         if (row + 1 < map.length && map[row + 1][col] != -1) {
             neighbors.add(new int[]{row + 1, col});
         }
+
+        // Vérifie si le voisin de gauche est valide
         if (col - 1 >= 0 && map[row][col - 1] != -1) {
             neighbors.add(new int[]{row, col - 1});
         }
+
+        // Vérifie si le voisin de droite est valide
         if (col + 1 < map[0].length && map[row][col + 1] != -1) {
             neighbors.add(new int[]{row, col + 1});
         }
+
         return neighbors;
     }
 
-    // Méthode auxiliaire pour vérifier si un point est stratégique
+    /**
+     * Vérifie si un point donné est un point stratégique.
+     *
+     * @param point Le point à vérifier.
+     * @return true si le point est un point stratégique, false sinon.
+     */
     public static boolean isStrategicPoint(int[] point) {
         for (int[] strategicPoint : strategiques) {
             if (Arrays.equals(strategicPoint, point)) {
@@ -128,7 +153,12 @@ public class Main {
         return false;
     }
 
-    // Calcul du coût de déplacement pour un chemin donné
+    /**
+     * Calcule le coût total d'un chemin en additionnant les poids de chaque déplacement.
+     *
+     * @param path Le chemin pour lequel calculer le coût.
+     * @return Le coût total du chemin.
+     */
     public static int calculateCost(List<int[]> path) {
         int cost = 0;
         for (int i = 0; i < path.size() - 1; i++) {
@@ -139,6 +169,11 @@ public class Main {
         return cost;
     }
 
+    /**
+     * Trouve le chemin rapportant le plus de points en se rendant aux points stratégiques spécifiés.
+     *
+     * @return Le chemin rapportant le plus de points.
+     */
     public static List<int[]> findHighestScoringPath() {
         List<int[]> strategicPoints = new ArrayList<>();
 
@@ -170,29 +205,57 @@ public class Main {
         return highestScoringPath;
     }
 
+    /**
+     * Génère toutes les permutations possibles des points donnés.
+     *
+     * @param points La liste des points à permuter.
+     * @return La liste de toutes les permutations générées.
+     */
     private static List<List<int[]>> generatePermutations(List<int[]> points) {
         List<List<int[]>> permutations = new ArrayList<>();
         backtrack(points, new ArrayList<>(), new boolean[points.size()], permutations);
         return permutations;
     }
 
+    /**
+     * Effectue un parcours récursif pour générer toutes les permutations des points donnés.
+     *
+     * @param points       La liste des points à permuter.
+     * @param current      La liste courante des points sélectionnés dans la permutation en cours.
+     * @param visited      Un tableau de booléens indiquant si chaque point a été visité ou non.
+     * @param permutations La liste qui stocke toutes les permutations générées.
+     */
     private static void backtrack(List<int[]> points, List<int[]> current, boolean[] visited, List<List<int[]>> permutations) {
+        // Si tous les points ont été sélectionnés, ajoute la permutation courante à la liste des permutations.
         if (current.size() == points.size()) {
             permutations.add(new ArrayList<>(current));
             return;
         }
 
+        // Parcours de tous les points non visités pour générer les permutations.
         for (int i = 0; i < points.size(); i++) {
             if (!visited[i]) {
+                // Sélectionne le point i et marque le point comme visité.
                 current.add(points.get(i));
                 visited[i] = true;
+
+                // Appel récursif pour continuer à générer les permutations.
                 backtrack(points, current, visited, permutations);
+
+                // Désélectionne le point i et le marque comme non visité avant de passer au point suivant.
                 visited[i] = false;
                 current.remove(current.size() - 1);
             }
         }
     }
 
+    /**
+     * Trouve un chemin reliant les points dans l'ordre spécifié.
+     *
+     * @param start  Le point de départ du chemin.
+     * @param points Les points à visiter dans l'ordre.
+     * @return Une liste des coordonnées représentant le chemin trouvé.
+     */
     private static List<int[]> findPath(int[] start, List<int[]> points) {
         List<int[]> path = new ArrayList<>();
         int[] current = start;
@@ -200,11 +263,12 @@ public class Main {
         for (int[] point : points) {
             List<int[]> shortestPath = findShortestPath(current, point);
 
+            // Vérifie si le chemin le plus court est vide ou s'il contient une case bloquée
             if (shortestPath.isEmpty() || hasBlockedCell(shortestPath)) {
-                return new ArrayList<>();
+                return new ArrayList<>(); // Retourne un chemin vide pour indiquer l'impossibilité de trouver un chemin valide
             }
 
-            shortestPath.remove(0); // Remove the first element (current position)
+            shortestPath.remove(0); // Supprime le premier élément (position actuelle)
             path.addAll(shortestPath);
             current = point;
         }
@@ -212,14 +276,22 @@ public class Main {
         return path;
     }
 
+
+    /**
+     * Vérifie si un chemin contient une case bloquée.
+     *
+     * @param path Le chemin à vérifier.
+     * @return true si le chemin contient une case bloquée, sinon false.
+     */
     private static boolean hasBlockedCell(List<int[]> path) {
         for (int[] cell : path) {
+            // Vérifie si la case dans le chemin a une valeur de -1 (case bloquée)
             if (map[cell[0]][cell[1]] == -1) {
-                return true;
+                return true; // Retourne true dès qu'une case bloquée est trouvée
             }
         }
 
-        return false;
+        return false; // Retourne false si aucune case bloquée n'est trouvée
     }
 
     /**
@@ -246,22 +318,36 @@ public class Main {
         return score;
     }
 
+    /**
+     * Vérifie si un point donné est un point d'intérêt.
+     *
+     * @param point Les coordonnées du point à vérifier.
+     * @return true si le point est un point d'intérêt, sinon false.
+     */
     private static boolean isInterestPoint(int[] point) {
         for (int[] interest : interets.keySet()) {
+            // Vérifie si les coordonnées du point correspondent à celles d'un point d'intérêt dans la liste des clés
             if (Arrays.equals(interest, point)) {
-                return true;
+                return true; // Retourne true si le point est un point d'intérêt
             }
         }
-        return false;
+        return false; // Retourne false si le point n'est pas un point d'intérêt
     }
 
+    /**
+     * Récupère la valeur d'intérêt associée à un point donné.
+     *
+     * @param point Les coordonnées du point d'intérêt.
+     * @return La valeur d'intérêt du point, ou 0 si le point n'est pas trouvé.
+     */
     private static int getInterestValue(int[] point) {
         for (Map.Entry<int[], Integer> entry : interets.entrySet()) {
+            // Vérifie si les coordonnées du point correspondent à celles de la clé dans l'entrée de la carte des intérêts
             if (Arrays.equals(entry.getKey(), point)) {
-                return entry.getValue();
+                return entry.getValue(); // Retourne la valeur associée à la clé (point d'intérêt)
             }
         }
-        return 0;
+        return 0; // Retourne 0 si le point n'est pas trouvé ou n'a pas de valeur d'intérêt associée
     }
 
     /**
